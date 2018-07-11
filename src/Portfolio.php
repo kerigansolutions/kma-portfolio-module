@@ -152,7 +152,7 @@ class Portfolio
         }
         if ($type != '') {
             $typearray = [
-                'taxonomy' => 'build-location',
+                'taxonomy' => 'construction-type',
                 'field' => 'slug',
                 'terms' => $type,
                 'include_children' => false,

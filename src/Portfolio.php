@@ -4,6 +4,7 @@ namespace KeriganSolutions\KMAPortfolio;
 class Portfolio
 {
     public $menuName;
+    public $menuIcon;
     public $singularName;
     public $pluralName;
     public $hideGallery;
@@ -13,12 +14,20 @@ class Portfolio
         $this->menuName = 'Portfolio';
         $this->singularName = 'Project';
         $this->pluralName = 'Portfolio';
+        $this->menuIcon = 'portfolio';
         $this->hideGallery = false;
     }
 
     public function menuName($menuName)
     {
         $this->menuName = $menuName;
+
+        return $this;
+    }
+
+    public function menuIcon($menuIcon)
+    {
+        $this->menuIcon = $menuIcon;
 
         return $this;
     }
@@ -149,7 +158,7 @@ class Portfolio
             'has_archive' => true,
             'rewrite' => true,
             'query_var' => true,
-            'menu_icon' => 'dashicons-admin-post',
+            'menu_icon' => 'dashicons-' . $this->menuIcon,
             'show_in_rest' => true,
             'rest_base' => 'project',
             'rest_controller_class' => 'WP_REST_Posts_Controller',

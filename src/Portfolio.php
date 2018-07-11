@@ -126,7 +126,7 @@ class Portfolio
     /*
      * Query WP for slides
      */
-    public function queryProjects($limit = -1, $category = '')
+    public function queryProjects($limit = -1, $location = '', $type = '')
     {
         $request = [
             'posts_per_page' => $limit,
@@ -137,23 +137,29 @@ class Portfolio
             'post_status' => 'publish',
         ];
 
-        if ($category != '') {
-            $categoryarray = [
-                [
-                    'taxonomy' => 'build_location',
-                    'field' => 'slug',
-                    'terms' => $category,
-                    'include_children' => false,
-                ],
-                [
-                    'taxonomy' => 'construction_type',
-                    'field' => 'slug',
-                    'terms' => $category,
-                    'include_children' => false,
-                ],
-            ];
-            $request['tax_query'] = $categoryarray;
+        if($location != '' || $type != ''){
+            $request['tax_query'] = [];
         }
+
+        if ($location != '') {
+            $locationarray = [
+                'taxonomy' => 'build-location',
+                'field' => 'slug',
+                'terms' => $location,
+                'include_children' => false,
+            ];
+            $request['tax_query'][] = $locationarray;
+        }
+        if ($type != '') {
+            $typearray = [
+                'taxonomy' => 'build-location',
+                'field' => 'slug',
+                'terms' => $type,
+                'include_children' => false,
+            ];
+            $request['tax_query'][] = $typearray;
+        }
+
 
         $projectList = get_posts($request);
 
@@ -165,6 +171,9 @@ class Portfolio
                 'slug' => (isset($project->post_name) ? $project->post_name : null),
                 'photo' => get_field('image', $project->ID),
                 'gallery' => get_field('gallery', $project->ID),
+                'link'    => get_permalink($project->ID),
+                'build_location' => get_the_terms($project->ID, 'build-location'),
+                'construciton_type' => get_the_terms($project->ID, 'construction-type')
             ]);
         }
 
@@ -177,8 +186,9 @@ class Portfolio
     public function getProjects($request)
     {
         $limit = $request->get_param('limit');
-        $category = $request->get_param('category');
-        return rest_ensure_response($this->queryProjects($limit, $category));
+        $location = $request->get_param('build-location');
+        $type = $request->get_param('construction-type');
+        return rest_ensure_response($this->queryProjects($limit, $location, $type));
     }
 
     /**

@@ -16,6 +16,8 @@ class Portfolio
         $this->pluralName = 'Portfolio';
         $this->menuIcon = 'portfolio';
         $this->hideGallery = false;
+
+        $this->addRoutes();
     }
 
     public function menuName($menuName)
@@ -119,6 +121,79 @@ class Portfolio
         if (function_exists('acf_add_local_field_group')) {
             add_action('acf/init', [$this, 'registerFields']);
         }
+    }
+
+    /*
+     * Query WP for slides
+     */
+    public function queryProjects($limit = -1, $category = '')
+    {
+        $request = [
+            'posts_per_page' => $limit,
+            'offset' => 0,
+            'order' => 'ASC',
+            'orderby' => 'menu_order',
+            'post_type' => 'project',
+            'post_status' => 'publish',
+        ];
+
+        if ($category != '') {
+            $categoryarray = [
+                [
+                    'taxonomy' => 'build_location',
+                    'field' => 'slug',
+                    'terms' => $category,
+                    'include_children' => false,
+                ],
+                [
+                    'taxonomy' => 'construction_type',
+                    'field' => 'slug',
+                    'terms' => $category,
+                    'include_children' => false,
+                ],
+            ];
+            $request['tax_query'] = $categoryarray;
+        }
+
+        $projectList = get_posts($request);
+
+        $projectArray = [];
+        foreach ($projectList as $project) {
+            array_push($projectArray, [
+                'id' => (isset($project->ID) ? $project->ID : null),
+                'name' => (isset($project->post_title) ? $project->post_title : null),
+                'slug' => (isset($project->post_name) ? $project->post_name : null),
+                'photo' => get_field('image', $project->ID),
+                'gallery' => get_field('gallery', $project->ID),
+            ]);
+        }
+
+        return $projectArray;
+    }
+
+    /*
+     * Get slides using REST API endpoint
+     */
+    public function getProjects($request)
+    {
+        $limit = $request->get_param('limit');
+        $category = $request->get_param('category');
+        return rest_ensure_response($this->queryProjects($limit, $category));
+    }
+
+    /**
+     * Add REST API routes
+     */
+    public function addRoutes()
+    {
+        register_rest_route(
+            'kerigansolutions/v1',
+            '/projects',
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'getProjects']
+            ]
+        );
     }
     public function project_init()
     {

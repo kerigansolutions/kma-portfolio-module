@@ -17,7 +17,8 @@ class Portfolio
         $this->menuIcon = 'portfolio';
         $this->hideGallery = false;
 
-        $this->addRoutes();
+        // Create REST API Routes
+        add_action( 'rest_api_init', [$this, 'addRoutes'] );
     }
 
     public function menuName($menuName)

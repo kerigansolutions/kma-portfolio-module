@@ -1,5 +1,5 @@
 <?php
-namespace KeriganSolutions\Portfolio;
+namespace KeriganSolutions\KMAPortfolio;
 
 class Portfolio
 {
@@ -44,7 +44,7 @@ class Portfolio
         return $this;
     }
 
-    private function registerFields()
+    public function registerFields()
     {
         // ACF Group: slide Details
         acf_add_local_field_group(array(
@@ -85,7 +85,7 @@ class Portfolio
             'max_height' => 0,
         ));
 
-        if (! $this->hideGallery) {
+        if (!$this->hideGallery) {
             // Gallery
             acf_add_local_field(array(
                 'key' => 'gallery',
@@ -105,13 +105,13 @@ class Portfolio
 
     public function use()
     {
-        add_action ('init', [$this, 'project_init']);
+        add_action('init', [$this, 'project_init']);
         add_filter('post_updated_messages', [$this, 'project_updated_messages']);
         if (function_exists('acf_add_local_field_group')) {
             add_action('acf/init', [$this, 'registerFields']);
         }
     }
-    private function project_init()
+    public function project_init()
     {
         register_post_type('project', array(
             'labels' => array(
@@ -128,10 +128,10 @@ class Portfolio
                 'use_featured_image' => _x('Use as featured image', 'project', 'wordplate'),
                 'filter_items_list' => __('Filter Projects list', 'wordplate'),
                 'items_list_navigation' => __($this->menuName . ' list navigation', 'wordplate'),
-                'items_list' => __($this->menuName .' list', 'wordplate'),
-                'new_item' => __('New '. $this->singularName, 'wordplate'),
+                'items_list' => __($this->menuName . ' list', 'wordplate'),
+                'new_item' => __('New ' . $this->singularName, 'wordplate'),
                 'add_new' => __('Add New', 'wordplate'),
-                'add_new_item' => __('Add New '. $this->singularName, 'wordplate'),
+                'add_new_item' => __('Add New ' . $this->singularName, 'wordplate'),
                 'edit_item' => __('Edit ' . $this->singularName, 'wordplate'),
                 'view_item' => __('View ' . $this->singularName, 'wordplate'),
                 'view_items' => __('View ' . $this->menuName, 'wordplate'),
@@ -163,7 +163,7 @@ class Portfolio
      * @param  array $messages Post updated messages.
      * @return array Messages for the `project` post type.
      */
-    function project_updated_messages($messages)
+    public function project_updated_messages($messages)
     {
         global $post;
 
